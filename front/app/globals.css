@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#trailing-circle {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(0, 150, 255, 0.4);
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.4s ease-out;
+  opacity: 0;
+}
+
+#container {
+  overflow: hidden;
+  position: relative;
+  background: #1c398e;
+  padding: 8px 20px;
+  cursor: pointer;
+  border-radius: 100px;
+  transform: scale(1);
+  transition: background 0.3s ease-out, transform 0.2s ease-out !important;
+}
+
+#container:hover {
+  background: #15275d;
+}
+
+#container:active {
+  background: #3856b0;
+  transition: background 0.05s ease-out, transform 0.2s ease-out;
+  transform: scale(0.98);
+}
+
+
+.button-inner-text {
+  position: relative;
+  z-index: 2;
+  color: white;
+  user-select: none;
+}

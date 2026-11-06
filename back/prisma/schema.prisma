@@ -1,0 +1,143 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  // Поля
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  tag          String   @unique
+  name         String
+  profileImage String?  @map("profile_image")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  messages  Message[]
+  chats     UserChat[]
+  userRoles UserRole[]
+
+  @@map("users")
+}
+
+model Role {
+  // Поля
+  id   Int    @id @default(autoincrement())
+  name String
+
+  // Связи
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Chat {
+  // Поля
+  id        Int      @id @default(autoincrement())
+  type      Int
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Связи
+  users    UserChat[]
+  messages Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  // Поля
+  id        Int           @id @default(autoincrement())
+  status    MessageStatus @default(PENDING)
+  content   String
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  // Внешние ключи
+  userId Int @map("user_id")
+  chatId Int @map("chat_id")
+
+  // Связи
+  user User @relation(fields: [userId], references: [id])
+  chat Chat @relation(fields: [chatId], references: [id])
+
+  @@map("messages")
+}
+
+model Permission {
+  // Поля
+  id   Int    @id @default(autoincrement())
+  name String
+
+  // Связи
+  permissionRoles RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserChat {
+  // Поля
+  joinedAt DateTime @default(now()) @map("joined_at")
+  role     String
+
+  // Внешние ключи
+  userId Int @map("user_id")
+  chatId Int @map("chat_id")
+
+  // Связи
+  user User @relation(fields: [userId], references: [id])
+  chat Chat @relation(fields: [chatId], references: [id])
+
+  @@id([userId, chatId])
+  @@map("user_chat")
+}
+
+model UserRole {
+  // Внешние ключи
+  userId Int @map("user_id")
+  roleId Int @map("role_id")
+
+  // Связи
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("user_role")
+}
+
+model RolePermission {
+  // Внешние ключи
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+
+  // Связи
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permission")
+}
+
+enum MessageStatus {
+  PENDING
+  DELIVERED
+  READ
+}
+
+enum ChatType {
+  MONOLOGUE
+  DIALOGUE
+  POLYLOGUE
+}
